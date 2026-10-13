@@ -1,22 +1,26 @@
-<!--
-  TEMPLATE: In Flavor-Branches mit konkretem Beispiel gefüllt. Ziel: In
-  5 Minuten verstehen, wo was liegt und wie es zusammenspielt.
--->
+<!-- TEMPLATE (Python): Aufbau und Datenfluss. Diagramm und Tabelle anpassen. -->
 
 # Architektur
 
 ## Überblick
-<Ein Absatz: Was sind die Hauptbestandteile?>
+Zwei Schichten: eine dünne CLI und eine reine Fachlogik.
 
 ```mermaid
 flowchart LR
-    A[Eingabe] --> B[Verarbeitung] --> C[Ausgabe]
+    U[Nutzer] -->|python -m hello_world Ada| CLI[__main__.py<br/>argparse]
+    CLI -->|greet name| Logic[greeting.py<br/>reine Funktion]
+    Logic -->|"Hello, Ada!"| CLI
+    CLI -->|stdout, Exit-Code| U
 ```
 
-## Bestandteile
-| Teil | Verantwortung | Hängt ab von |
+## Module
+| Modul | Verantwortung | Darf abhängen von |
 |---|---|---|
-| `<pfad>` | <wofür> | <was> |
+| `hello_world.greeting` | Begrüßungstext erzeugen | nur Standardbibliothek |
+| `hello_world.__main__` | CLI-Argumente, Ausgabe, Exit-Code | `greeting` |
 
 ## Prinzipien
-- <z.B. "Logik und I/O getrennt", "Konfiguration nur über Umgebungsvariablen">
+- **Abhängigkeiten zeigen nach innen:** CLI kennt Fachlogik, nie umgekehrt.
+- **Fachlogik ist ohne Mocks testbar**, weil sie keine I/O macht.
+- **Konfiguration** über Umgebungsvariablen, gelesen nur in der äußersten Schicht.
+- Neue Ein-/Ausgabewege (z.B. Web-API) kommen als eigenes Modul neben `__main__.py`.

@@ -1,41 +1,47 @@
 <!--
-  TEMPLATE: Generische Vorlage aus dem main-Branch. In jedem Flavor-Branch
-  (flavor/python, flavor/bash, flavor/yaml, ...) ist diese Datei bereits
-  sprachspezifisch ausgefüllt. Wenn du von main aus startest: Abschnitte
-  unten ausfüllen, Platzhalter <...> ersetzen. Kurz halten (< 150 Zeilen).
+  TEMPLATE (Python-Flavor): Wird bei jeder OpenCode-Session automatisch geladen.
+  Kurz halten, Details in docs/. Hello-World durch dein Projekt ersetzen.
 -->
 
-# AGENTS.md – <projektname>
+# AGENTS.md – hello-world (Python)
 
 ## Projekt in einem Satz
-<Was macht das Projekt, für wen?>
+CLI-Tool, das Begrüßungen ausgibt. Beispiel für ein OpenCode-fähiges Python-Repo.
 
 ## Befehle
-Alle Flavors bieten dieselbe Schnittstelle über `make`:
 ```bash
-make lint    # Statische Prüfungen
-make fmt     # Automatisch formatieren
-make test    # Tests ausführen
+python -m venv .venv && source .venv/bin/activate
+make install                 # pip install -e ".[dev]" + pre-commit install
+python -m hello_world Ada    # App ausführen
+
+make lint    # ruff check + ruff format --check + mypy (strict)
+make fmt     # automatisch formatieren
+make test    # pytest inkl. Doctests
 make check   # lint + test – muss vor jedem Commit grün sein
+pytest tests/test_greeting.py::test_greet_default   # einzelner Test
 ```
-<Weitere Befehle: Setup, Ausführen, Deployment ...>
 
 ## Struktur
-- `<pfad>/` – <wofür>
-- `docs/` – Architektur, Konventionen, Tests, Entscheidungen (ADRs)
+- `src/hello_world/greeting.py` – Fachlogik (reine Funktionen, keine I/O)
+- `src/hello_world/__main__.py` – CLI: nur Argument-Parsing, Ausgabe, Exit-Code
+- `tests/test_<modul>.py` – pytest, spiegelt `src/`
+- `pyproject.toml` – Abhängigkeiten und Config für pytest, ruff, mypy
 
 ## Wichtige Regeln
-- <Harte Regeln, die bei jeder Änderung gelten>
-- Keine neuen Abhängigkeiten oder Tools ohne Rückfrage.
-- Nutzersichtbare Änderungen in `CHANGELOG.md` unter `[Unreleased]` eintragen.
+- Python ≥ 3.10, vollständige Type Hints (mypy strict), Docstrings für Öffentliches.
+- Fachlogik ohne I/O; `print`/`input`/Dateizugriffe nur in der CLI-Schicht.
+- Abhängigkeiten nur über `pyproject.toml`, nie ad hoc mit `pip install` – vorher fragen.
+- Neue Funktion ⇒ neuer Test. Bugfix ⇒ zuerst Test, der den Bug zeigt.
+- Nutzersichtbare Änderungen in `CHANGELOG.md` unter `[Unreleased]`.
 
 ## Nicht tun
-- Keine Secrets, Tokens oder Passwörter ausgeben, in Dateien schreiben oder committen.
-- Tests oder Lint-Regeln nicht abschwächen, um sie grün zu bekommen.
-- <Projektspezifische Verbote, z.B. "kein kubectl apply gegen Produktion">
+- Nichts unter `.venv/`, `dist/`, `build/` bearbeiten.
+- Keine Secrets ausgeben oder committen; Konfiguration über Umgebungsvariablen.
+- Keine `# type: ignore`/`# noqa` ohne Begründung im Kommentar.
+- Tests nicht abschwächen oder löschen, um sie grün zu bekommen.
 
 ## Weiterführende Doku (bei Bedarf lesen)
 - Architektur: @docs/architecture.md
 - Teststrategie: @docs/testing.md
 - Entscheidungen: @docs/decisions/
-- Code-Konventionen werden über `opencode.json` immer geladen: docs/conventions.md
+- Konventionen (immer geladen via opencode.json): docs/conventions.md
