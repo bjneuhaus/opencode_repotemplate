@@ -5,7 +5,7 @@
 
 # hello (Bash-Flavor)
 
-Bash-Variante des [OpenCode Basis-Templates](../../tree/main) für Admin- und
+Bash-Variante des OpenCode Basis-Templates (Branch `main`) für Admin- und
 Automatisierungsskripte. Enthält ein Beispielskript mit Strict Mode, getopts, Traps,
 Logging auf stderr sowie bats-Tests, shellcheck und shfmt.
 
