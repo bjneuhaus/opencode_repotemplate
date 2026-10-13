@@ -5,7 +5,7 @@
 
 # hello-world (Python-Flavor)
 
-Python-Variante des [OpenCode Basis-Templates](../../tree/main). Enthält ein kleines
+Python-Variante des OpenCode Basis-Templates (Branch `main`). Enthält ein kleines
 CLI-Beispiel mit Tests, Linting (ruff), Typprüfung (mypy strict) und pre-commit-Hooks.
 
 > Generische Beschreibung, alle Flavors und Pflegehinweise: siehe Branch **`main`**.
