@@ -5,7 +5,7 @@
 
 # hello (YAML-Flavor: OpenShift / Kubernetes)
 
-YAML-Variante des [OpenCode Basis-Templates](../../tree/main) für reine Manifest-Projekte
+YAML-Variante des OpenCode Basis-Templates (Branch `main`) für reine Manifest-Projekte
 auf OpenShift. Enthält eine Hello-World-Webseite (httpd) als Kustomize-Base mit
 `dev`- und `prod`-Overlay sowie eine dreistufige Validierung:
 yamllint → kube-linter → kubeconform.
