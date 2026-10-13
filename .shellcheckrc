@@ -1,0 +1,6 @@
+# shellcheck-Konfiguration für das ganze Repo
+shell=bash
+external-sources=true
+source-path=SCRIPTDIR
+# Zusätzliche optionale Prüfungen (shellcheck --list-optional)
+enable=require-variable-braces,check-unassigned-uppercase,deprecate-which,avoid-nullary-conditions,add-default-case,quote-safe-variables

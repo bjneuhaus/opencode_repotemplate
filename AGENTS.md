@@ -1,41 +1,49 @@
 <!--
-  TEMPLATE: Generische Vorlage aus dem main-Branch. In jedem Flavor-Branch
-  (flavor/python, flavor/bash, flavor/yaml, ...) ist diese Datei bereits
-  sprachspezifisch ausgefüllt. Wenn du von main aus startest: Abschnitte
-  unten ausfüllen, Platzhalter <...> ersetzen. Kurz halten (< 150 Zeilen).
+  TEMPLATE (Bash-Flavor): Wird bei jeder OpenCode-Session automatisch geladen.
+  Kurz halten, Details in docs/. Hello-World durch eigene Skripte ersetzen.
 -->
 
-# AGENTS.md – <projektname>
+# AGENTS.md – hello (Bash)
 
 ## Projekt in einem Satz
-<Was macht das Projekt, für wen?>
+Admin-Skript, das Begrüßungen ausgibt. Beispiel für ein OpenCode-fähiges Bash-Repo.
 
 ## Befehle
-Alle Flavors bieten dieselbe Schnittstelle über `make`:
 ```bash
-make lint    # Statische Prüfungen
-make fmt     # Automatisch formatieren
-make test    # Tests ausführen
+bin/hello.sh Ada          # Skript ausführen
+bin/hello.sh -h           # Hilfe
+
+make lint    # shellcheck + shfmt -d
+make fmt     # shfmt -w
+make test    # bats tests/
 make check   # lint + test – muss vor jedem Commit grün sein
+bats tests/greeting.bats  # einzelne Testdatei
 ```
-<Weitere Befehle: Setup, Ausführen, Deployment ...>
+Voraussetzungen: `shellcheck`, `shfmt`, `bats` (RHEL/Fedora: `dnf install ShellCheck shfmt bats`).
 
 ## Struktur
-- `<pfad>/` – <wofür>
-- `docs/` – Architektur, Konventionen, Tests, Entscheidungen (ADRs)
+- `bin/*.sh` – ausführbare Einstiegsskripte: Optionen parsen, `main`, Traps
+- `lib/*.sh` – gesourcte Funktionsbibliotheken, kein Code außerhalb von Funktionen
+- `lib/common.sh` – Logging (`log_info`, `log_error`, `log_debug`), `die`, `require_cmd`
+- `tests/*.bats` – bats-Tests; `<lib>.bats` für Funktionen, `<skript>.bats` für Aufrufe
 
 ## Wichtige Regeln
-- <Harte Regeln, die bei jeder Änderung gelten>
-- Keine neuen Abhängigkeiten oder Tools ohne Rückfrage.
-- Nutzersichtbare Änderungen in `CHANGELOG.md` unter `[Unreleased]` eintragen.
+- Bash ≥ 4.4, Shebang `#!/usr/bin/env bash`, immer `set -Eeuo pipefail`.
+- Jede Variablenexpansion in doppelten Anführungszeichen und mit Klammern: `"${var}"`.
+- Logs und Fehler auf **stderr**, Nutzdaten auf **stdout**.
+- Exit-Codes: 0 OK, 1 Laufzeitfehler, 2 Bedienfehler.
+- Skripte, die Systeme verändern, brauchen `-n` (Dry-Run) und müssen idempotent sein.
+- Neue Funktion ⇒ bats-Test. Nutzersichtbare Änderungen in `CHANGELOG.md`.
 
 ## Nicht tun
-- Keine Secrets, Tokens oder Passwörter ausgeben, in Dateien schreiben oder committen.
-- Tests oder Lint-Regeln nicht abschwächen, um sie grün zu bekommen.
-- <Projektspezifische Verbote, z.B. "kein kubectl apply gegen Produktion">
+- Kein `eval`, kein Parsen von `ls`, kein `curl … | bash`.
+- Kein `sudo` innerhalb von Skripten – Rechte prüfen und mit Hinweis abbrechen.
+- Keine Skripte gegen echte Server ausführen, um sie zu „testen“.
+- Keine Secrets in Skripten oder Argumenten (landen in `ps`/History) – Umgebungsvariablen oder Dateien mit `0600`.
+- `# shellcheck disable=` nur mit Begründung im Kommentar.
 
 ## Weiterführende Doku (bei Bedarf lesen)
 - Architektur: @docs/architecture.md
 - Teststrategie: @docs/testing.md
 - Entscheidungen: @docs/decisions/
-- Code-Konventionen werden über `opencode.json` immer geladen: docs/conventions.md
+- Konventionen (immer geladen via opencode.json): docs/conventions.md

@@ -14,3 +14,15 @@ trim_trailing_whitespace = false
 
 [Makefile]
 indent_style = tab
+
+# --- Bash-Flavor: shfmt liest diese Einstellungen ---
+[*.{sh,bash}]
+shell_variant = bash
+binary_next_line = true
+switch_case_indent = true
+space_redirects = true
+
+[*.bats]
+shell_variant = bats
+switch_case_indent = true
+space_redirects = true

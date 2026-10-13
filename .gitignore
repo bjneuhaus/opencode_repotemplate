@@ -6,3 +6,6 @@
 .env
 *.log
 tmp/
+
+# Bash
+*.bak

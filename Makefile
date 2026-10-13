@@ -1,12 +1,22 @@
-# Einheitliche Schnittstelle für alle Flavors: make lint | fmt | test | check
-# Im main-Branch gibt es nur Platzhalter – wechsle in einen Flavor-Branch.
+# Bash-Flavor – einheitliche Ziele: lint | fmt | test | check
+# Benötigt: shellcheck, shfmt, bats (z.B. dnf install ShellCheck shfmt bats)
+SH_FILES := $(shell find bin lib -type f -name '*.sh')
 .PHONY: help lint fmt test check
 
 help:
-	@echo "Ziele: lint, fmt, test, check"
-	@echo "Dies ist der generische main-Branch. Flavors: git branch -r | grep flavor/"
+	@echo "lint   shellcheck + shfmt -d"
+	@echo "fmt    shfmt -w (Formatierung anwenden)"
+	@echo "test   bats tests/"
+	@echo "check  lint + test"
 
-lint fmt test:
-	@echo "Kein Flavor gewählt – '$@' ist in main nicht definiert."
+lint:
+	shellcheck $(SH_FILES)
+	shfmt -d bin lib tests
+
+fmt:
+	shfmt -w bin lib tests
+
+test:
+	bats tests/
 
 check: lint test
