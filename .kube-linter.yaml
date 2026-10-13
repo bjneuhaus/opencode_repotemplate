@@ -1,0 +1,11 @@
+---
+# kube-linter: https://docs.kubelinter.io
+# Standard-Checks sind aktiv (u.a. latest-tag, run-as-non-root, unset-*-requirements,
+# no-liveness-probe, privilege-escalation-container). Zusätzlich:
+checks:
+  include:
+    - non-isolated-pod         # Pod ohne NetworkPolicy
+    - liveness-port            # Probe zeigt auf existierenden Port
+    - readiness-port
+# Ausnahmen nicht hier global, sondern am Objekt mit Begründung:
+#   metadata.annotations: ignore-check.kube-linter.io/<check>: "<Begründung>"

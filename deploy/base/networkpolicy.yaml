@@ -1,0 +1,23 @@
+---
+# Erlaubt eingehenden Verkehr nur vom OpenShift-Router (Ingress-Controller).
+# Alles andere an diese Pods wird verworfen.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: hello-allow-from-router
+  labels:
+    app.kubernetes.io/name: hello
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: hello
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              network.openshift.io/policy-group: ingress
+      ports:
+        - port: 8080
+          protocol: TCP

@@ -6,3 +6,8 @@
 .env
 *.log
 tmp/
+
+# YAML-Flavor
+build/
+*.kubeconfig
+kubeconfig*

@@ -1,0 +1,28 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: hello-prod
+
+resources:
+  - ../../base
+  - pdb.yaml
+
+labels:
+  - pairs:
+      app.kubernetes.io/instance: hello-prod
+    includeTemplates: true
+
+replicas:
+  - name: hello
+    count: 2
+
+# In Produktion per Digest pinnen (unveränderlich), z.B.:
+#   skopeo inspect docker://registry.access.redhat.com/ubi9/httpd-24:<tag> | jq -r .Digest
+images:
+  - name: hello-web
+    newName: registry.access.redhat.com/ubi9/httpd-24
+    digest: "sha256:PIN-ME"  # TEMPLATE: durch echten Digest ersetzen
+
+patches:
+  - path: patch-resources.yaml

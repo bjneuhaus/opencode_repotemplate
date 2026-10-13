@@ -1,0 +1,18 @@
+---
+# Strategic-Merge-Patch: Container werden über "name" zusammengeführt.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello
+spec:
+  template:
+    spec:
+      containers:
+        - name: httpd
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi

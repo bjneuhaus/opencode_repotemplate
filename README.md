@@ -1,123 +1,97 @@
-# OpenCode Basis-Template
+<!--
+  TEMPLATE (YAML-Flavor): Titel, Beschreibung und Schnellstart ersetzen.
+  Tree View aktuell halten.
+-->
 
-Basis-Repository für Projekte, die mit [OpenCode](https://opencode.ai) entwickelt werden.
-Der `main`-Branch enthält nur die **generische Struktur**. Sprach- bzw. plattformspezifische
-Varianten liegen in eigenen **Flavor-Branches**.
+# hello (YAML-Flavor: OpenShift / Kubernetes)
 
-> **Du bist im `main`-Branch.** Für ein neues Projekt wechselst du in den passenden Flavor
-> und startest von dort.
+YAML-Variante des [OpenCode Basis-Templates](../../tree/main) für reine Manifest-Projekte
+auf OpenShift. Enthält eine Hello-World-Webseite (httpd) als Kustomize-Base mit
+`dev`- und `prod`-Overlay sowie eine dreistufige Validierung:
+yamllint → kube-linter → kubeconform.
 
-## Flavors
+> Generische Beschreibung, alle Flavors und Pflegehinweise: siehe Branch **`main`**.
 
-| Branch | Für | Werkzeuge |
-|---|---|---|
-| `flavor/python` | Python-Tools und -Services | ruff, pytest, mypy, pre-commit |
-| `flavor/bash` | Admin-Skripte, Automatisierung | shellcheck, shfmt, bats |
-| `flavor/yaml` | OpenShift-/Kubernetes-Manifeste | kustomize, yamllint, kubeconform, kube-linter |
-| `main` | Generische Basis, Ausgangspunkt für neue Flavors | – |
-
-Alle Flavors bieten dieselbe Schnittstelle: `make lint`, `make fmt`, `make test`, `make check`.
-Dadurch funktionieren die OpenCode-Commands (`/check`, `/review`) überall gleich.
-
-## Neues Projekt starten
+## Schnellstart
 
 ```bash
-# Variante A: Nur den gewünschten Flavor übernehmen (empfohlen)
-git clone --branch flavor/python --single-branch <repo-url> mein-projekt
-cd mein-projekt
-git branch -m flavor/python main          # Flavor wird zum main des neuen Projekts
-git remote set-url origin <neue-repo-url>
-
-# Variante B: Fork über GitLab/GitHub/Gitea, danach
-git checkout flavor/python
-git checkout -b main-neu                  # oder Default-Branch in der Oberfläche umstellen
+# Werkzeuge (Beispiele): pip install yamllint pre-commit
+#   kube-linter, kubeconform, yamlfmt: Release-Binaries von GitHub bzw. brew
+# 1. Image-Tag in deploy/overlays/dev/kustomization.yaml pinnen ("PIN-ME" ersetzen)
+make check
+oc login ... && make diff ENV=dev        # nur lesend
 ```
 
-Danach in jeder Markdown-Datei die `<!-- TEMPLATE: ... -->`-Kommentare abarbeiten:
+In OpenCode: `/check`, `/review`, `@reviewer`, `@docs-writer`.
 
-```bash
-grep -rn "TEMPLATE:" --include="*.md" .
-```
-
-## Gemeinsame Struktur (in allen Branches)
+## Struktur
 
 ```
 .
-├── AGENTS.md                     # ★ Hauptregeln für OpenCode – bei jeder Session automatisch geladen
-├── opencode.json                 # OpenCode-Config: lädt CONTRIBUTING.md + docs/conventions.md immer mit
-├── README.md                     # Überblick, Schnellstart, Tree View (pro Flavor angepasst)
-├── CONTRIBUTING.md               # Workflow, Commits, allgemeine Regeln (gemeinsam, nicht in Flavors ändern)
-├── CHANGELOG.md                  # Änderungshistorie nach "Keep a Changelog"
-├── Makefile                      # Einheitliche Ziele lint | fmt | test | check (pro Flavor gefüllt)
-├── .editorconfig                 # Einrückung, Zeilenenden, Encoding
-├── .gitignore
-├── .pre-commit-config.yaml       # Git-Hooks; Flavors ergänzen eigene Linter
+├── AGENTS.md                     # ★ OpenCode-Regeln: Befehle, Pflichtfelder, kein oc apply
+├── opencode.json                 # lädt CONTRIBUTING.md + docs/conventions.md immer mit
+├── README.md                     # diese Datei
+├── CONTRIBUTING.md               # Workflow, Commits (gemeinsam mit main)
+├── CHANGELOG.md
+├── Makefile                      # render | lint | fmt | test | check | diff | clean
+├── .editorconfig
+├── .gitignore                    # + build/, kubeconfig
+├── .pre-commit-config.yaml       # generische Hooks + yamllint
+├── .yamllint.yaml                # ★ YAML-Stilregeln (Einrückung, Booleans, Duplikate)
+├── .yamlfmt                      # ★ Formatter-Config für make fmt
+├── .kube-linter.yaml             # ★ Best-Practice-Checks für Kubernetes-Objekte
 │
 ├── .opencode/
 │   ├── agents/
-│   │   ├── reviewer.md           # @reviewer – read-only Review gegen Konventionen (gemeinsam)
-│   │   └── docs-writer.md        # @docs-writer – pflegt Doku (gemeinsam)
+│   │   ├── reviewer.md           # @reviewer – read-only Review (gemeinsam)
+│   │   └── docs-writer.md        # @docs-writer – Doku-Pflege (gemeinsam)
 │   ├── commands/
-│   │   ├── check.md              # /check – make check ausführen, Fehler erklären (gemeinsam)
-│   │   ├── review.md             # /review – Review via @reviewer (gemeinsam)
-│   │   └── changelog.md          # /changelog – CHANGELOG aus Commits (gemeinsam)
+│   │   ├── check.md              # /check – make check + Fehleranalyse (gemeinsam)
+│   │   ├── review.md             # /review (gemeinsam)
+│   │   └── changelog.md          # /changelog (gemeinsam)
 │   └── skills/
-│       └── write-adr/SKILL.md    # ADR anlegen (gemeinsam); Flavors ergänzen eigene Skills
+│       ├── write-adr/SKILL.md    # ADR anlegen (gemeinsam)
+│       └── new-overlay/SKILL.md  # ★ YAML: neue Umgebung als Overlay anlegen
 │
-└── docs/
-    ├── architecture.md           # Aufbau und Datenfluss (pro Flavor mit Beispiel)
-    ├── conventions.md            # Code-Konventionen, immer geladen (pro Flavor)
-    ├── testing.md                # Teststrategie, bei Bedarf gelesen (pro Flavor)
-    └── decisions/                # Architecture Decision Records
-        ├── 0000-template.md      #   Vorlage
-        └── 0001-flavor-branches.md  # Warum Flavors als Branches
+├── docs/
+│   ├── architecture.md           # Laufzeit- und Kustomize-Diagramm, Ressourcentabelle
+│   ├── conventions.md            # Labels, Pflichtfelder, Image-Pinning (immer geladen)
+│   ├── testing.md                # Validierungsstufen, Offline-Modus (bei Bedarf)
+│   └── decisions/
+│       ├── 0000-template.md
+│       ├── 0001-flavor-branches.md
+│       ├── 0002-kustomize-und-gitops.md
+│       └── 0003-httpd-ohne-readonly-rootfs.md
+│
+└── deploy/
+    ├── base/                     # umgebungsneutral, kein Namespace, kein Image-Tag
+    │   ├── kustomization.yaml    #   Ressourcenliste, Labels, configMapGenerator
+    │   ├── serviceaccount.yaml   #   eigener SA ohne Token-Mount
+    │   ├── deployment.yaml       #   httpd mit Probes, Limits, Security Context
+    │   ├── service.yaml          #   ClusterIP :8080
+    │   ├── route.yaml            #   OpenShift Route, TLS edge
+    │   ├── networkpolicy.yaml    #   nur Router darf zugreifen
+    │   └── content/
+    │       └── index.html        #   Webseiteninhalt → ConfigMap
+    └── overlays/
+        ├── dev/
+        │   └── kustomization.yaml   # ns hello-dev, 1 Replica, Image-Tag
+        └── prod/
+            ├── kustomization.yaml   # ns hello-prod, 2 Replicas, Digest
+            ├── pdb.yaml             # PodDisruptionBudget
+            └── patch-resources.yaml # höhere Requests/Limits
 ```
 
-### Wie OpenCode die Dateien nutzt
-
-| Datei(en) | Wann geladen | Zweck |
-|---|---|---|
-| `AGENTS.md` | Immer, automatisch | Kurzer Kern: Befehle, Struktur, harte Regeln |
-| `opencode.json` → `instructions` | Immer | Regeln, die bei fast jeder Änderung gelten |
-| `@docs/...` in AGENTS.md | Bei Bedarf | Details, die nur manchmal gebraucht werden |
-| `.opencode/agents/*.md` | Bei `@name` oder per Tab | Rollen mit eigenen Rechten |
-| `.opencode/commands/*.md` | Bei `/name` | Wiederkehrende Prompts |
-| `.opencode/skills/*/SKILL.md` | Wenn die Aufgabe zur `description` passt | Mehrschrittige Abläufe |
-
-## Pflege des Templates
-
-**Gemeinsame Dateien** (CONTRIBUTING.md, Agents, `/check`, `/review`, `/changelog`, `write-adr`,
-`docs/decisions/0000-template.md`) werden nur in `main` geändert und dann in alle Flavors gemergt:
+## Nach dem Fork anpassen
 
 ```bash
-for b in flavor/python flavor/bash flavor/yaml; do
-  git checkout "$b" && git merge --no-edit main
-done
-git checkout main
+grep -rn "TEMPLATE:\|PIN-ME" .
 ```
 
-**Flavor-spezifische Dateien** (AGENTS.md, README.md, Makefile, docs/architecture.md,
-docs/conventions.md, docs/testing.md, .pre-commit-config.yaml, .gitignore) werden nur im
-jeweiligen Flavor geändert. Ändert `main` eine davon, entstehen beim Merge Konflikte –
-dann die Flavor-Version behalten und die generische Änderung von Hand übertragen.
-
-### Neuen Flavor anlegen (z.B. Java)
-
-```bash
-git checkout main
-git checkout -b flavor/java
-```
-
-1. `Makefile` mit `lint`, `fmt`, `test`, `check` füllen.
-2. `AGENTS.md`, `docs/conventions.md`, `docs/testing.md`, `docs/architecture.md` ausfüllen.
-3. Kleines Hello-World-Beispiel mit Test ergänzen, `make check` muss grün sein.
-4. Linter-Hooks in `.pre-commit-config.yaml`, Build-Artefakte in `.gitignore`.
-5. Mindestens einen flavor-spezifischen Skill unter `.opencode/skills/`.
-6. README: Tree View und Schnellstart für den Flavor, Tabelle oben in **main** ergänzen.
-
-## Hinweise
-
-- Persönliche, projektübergreifende Regeln gehören nach `~/.config/opencode/AGENTS.md`, nicht ins Repo.
-- Gibt es keine `AGENTS.md`, nutzt OpenCode eine vorhandene `CLAUDE.md`.
-- Frontmatter-Felder von Agents und Commands können sich zwischen OpenCode-Versionen ändern
-  (ältere Versionen nutzen z.B. `agent/` und `command/` im Singular). Siehe [opencode.ai/docs](https://opencode.ai/docs/).
+- [ ] Image-Tag (dev) und Digest (prod) pinnen – `PIN-ME` ersetzen
+- [ ] Namen `hello` / Namespaces `hello-<env>` durch eigene ersetzen
+- [ ] Eigenes Image: möglichst `readOnlyRootFilesystem: true`, dann ADR 0003 und Annotation entfernen
+- [ ] `K8S_VERSION` im Makefile an die OpenShift-Version anpassen
+- [ ] `README.md`, `AGENTS.md`, `docs/*` anpassen
+- [ ] Unter reinem Kubernetes: `route.yaml` durch Ingress ersetzen, NetworkPolicy-Selector für den Ingress-Controller anpassen
+- [ ] `CHANGELOG.md` zurücksetzen, `LICENSE` ergänzen, `pre-commit autoupdate`

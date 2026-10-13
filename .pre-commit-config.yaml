@@ -10,3 +10,9 @@ repos:
       - id: check-merge-conflict
       - id: check-added-large-files
       - id: detect-private-key
+
+  # --- YAML-Flavor ---
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint

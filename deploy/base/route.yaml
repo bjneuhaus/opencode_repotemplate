@@ -1,0 +1,19 @@
+---
+# OpenShift Route (unter reinem Kubernetes stattdessen ein Ingress).
+# Ohne "host" erzeugt der Cluster einen Hostnamen aus Route-Name und Namespace.
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: hello
+  labels:
+    app.kubernetes.io/name: hello
+spec:
+  to:
+    kind: Service
+    name: hello
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
